@@ -1,0 +1,553 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  JDK_VERSION = "1.5";
+  static = true;
+  CHOICE_AMBIGUITY_CHECK = 4;
+}
+
+PARSER_BEGIN(eg1)
+import java.util.Vector;
+import java.util.HashMap;
+public class eg1
+{
+	static HashMap<String, TablaSimbolos> tablas = new HashMap <String, TablaSimbolos>();
+	static TablaSimbolos tablageneral = new TablaSimbolos();
+	static TablaSimbolos tablaactiva = tablageneral;
+	
+	static String nombrefuncion="HHHH";
+	
+  	public static void main(String args []) throws ParseException
+  	{
+  		tablas.put("general",tablageneral);
+	    eg1 parser;// = new eg1(System.in);
+          	if(args.length == 0){// ejecucion sin argumentos
+        	System.out.println ("ExampleParser: Leyendo de la entrada estandar ...");
+        	parser = new eg1(System.in);
+      	}else if(args.length == 1){// ejecucion con fichero de entrada
+	        System.out.println ("ExampleParser: Leyendo el fichero " + args[0]);
+        	try {
+          	parser = new eg1(new java.io.FileInputStream(args[0]));
+        	}
+        	catch(java.io.FileNotFoundException e) {
+          	System.out.println ("ExampleParser: El fichero " + args[0] + " no ha sido encontrado.");
+          	return;
+        	}
+      	}else {// en otro caso
+        	System.out.println ("ExampleParser:  Debes utilizarlo de una de las siguientes formas:");
+        	System.out.println ("         java ExampleParser < fichero");
+        	System.out.println ("Or");
+        	System.out.println ("         java ExampleParser fichero");
+        	return;
+      	}
+    	//  String linea;
+    	boolean cond = true;
+    	while (cond)
+    	{
+      	if (args.length == 1)
+      			System.out.println("Leyendo linea");
+      	else
+	      {
+	      		System.out.println("Leyendo de teclado...");
+	      		System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+	     }
+	      try
+	      {
+	        switch (eg1.one_line())
+	        {
+	          case -1 : 
+	          System.out.println("Fin fichero"); // fin fichero
+	          cond = false;
+	          break;
+	          case 0 : 
+	          System.out.println("OK.");
+	          break;
+	          case 1 : 
+	          System.out.println("OK. Funcion");
+	          tablageneral.imprimir();
+	          tablaactiva.imprimir();
+	          break;
+	          case 2 : 
+	          System.out.println("Ok. Sentencia");
+	          break;
+	          case 3 : 
+	          System.out.println("Ok. Expresion");
+	          break;
+	          case 4 : 
+	          System.out.println("Ok. Asignacion");
+	          break;
+	          default : 
+	          break;
+	        }
+	      }
+	      catch (Exception e)
+	      {
+	        System.out.println("NOK.");
+	        System.out.println(e.getMessage());
+	        eg1.ReInit(System.in);
+	      }
+	      catch (Error e)
+	      {
+	        System.out.println("Oops.");
+	        System.out.println(e.getMessage());
+	        break;
+	      }
+	    }
+	    System.out.println("Las tablas que hay son: "+tablas.toString());
+	    if (tablas.containsKey("general"))	    {	    	TablaSimbolos nueva=tablas.get("general");
+	    	nueva.imprimir();    	
+	   }	    else	    	System.out.println("NO TIENES NI ZORRA");	 }
+}
+
+PARSER_END(eg1)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| "/*": COMENTARIOS // mas de una linea de comentarios
+|  "//": COMENTARIOS_UNA_LINEA
+}
+
+ // si aparece */ en COMENTARIOS se obvian y se vuelve al estado DEFAULT
+< COMENTARIOS > SKIP : {
+  "*/": DEFAULT
+}
+< COMENTARIOS > MORE : // probar en lugar de SKIP poner MORE
+{
+<  ~[] > // cualquier caracter que aparezca despues de /* no se tiene en cuenta
+}
+
+< COMENTARIOS_UNA_LINEA > SKIP : // comentarios de una linea
+{
+//  <( "\n" | "--" )> : DEFAULT
+  "\n" : DEFAULT
+}
+
+< COMENTARIOS_UNA_LINEA > MORE : // probar en lugar de SKIP poner MORE
+{
+<  ~[] > // cualquier caracter que aparezca despues de // no se tiene en cuenta
+}
+
+TOKEN :
+{
+  < DO: "do" >
+| < WHILE: "while" >
+| < TRUE: "true" >
+| < FALSE: "false" >
+| < IF: "if" >
+| < VAR: "var" >
+| < RETURN: "return" >
+| < NEW: "new" >
+| < ARRAY: "Array" >
+| < PROMPT: "prompt" >
+| < DOCUMENT: "document" >
+| < WRITE: "write" >
+| < FUNCTION: "function" >
+}
+
+/* IDENTIFICADORES */
+
+TOKEN :
+{
+  < IDENTIFICADOR: <LETRA> (<LETRA>|<DIGITO>|"_")* >
+|
+  < #LETRA:
+      [ "a" - "z", "A" - "Z", "ñ", "Ñ" ] 
+  >
+|
+  < #DIGITO: [ "0"-"9" ]
+  >
+}
+
+/* CONSTANTES */
+
+TOKEN :
+{
+  < INTEGER_LITERAL: (<DIGITO>)+ >  // el mayor entero puede ser XXXX
+| < STRING_LITERAL: "\"" ( ~["\"","\\","\n","\r"] | "\\" ( ["n","t","0","\\","\'","\""] | ( ["\n","\r"] | "\r\n")))* "\""> 
+}
+
+/* SEPARADORES */
+
+TOKEN :
+{
+  < PARENDRCHA: "(" >
+| < PARENIZQ: ")" >
+| < LLAVEDRCHA: "{" >
+| < LLAVEIZQ: "}" >
+| < CORCHETEDRCHA: "[" >
+| < CORCHETEIZQ: "]" >
+| < PUNTOYCOMA: ";" >
+| < COMA: "," >
+| < PUNTO: "." >
+}
+
+TOKEN :
+{
+  < ASIGNACION: "=" >
+| < MAYOR: ">" >
+| < MENOR: "<" >
+| < MAS: "+" >
+| < MENOS: "-" >
+| < MUL: "*" >
+| < DIV: "/" >
+| < MODULO: "%" >
+| < INTERROGANTE: "?" >
+| < DOSPUNTOS: ":" >
+| < IGUAL: "==" >
+| < MENORIGUAL: "<=" >
+| < MAYORIGUAL: ">=" >
+| < DISTINTO: "!=" >
+| < OR: "||" >
+| < AND: "&&" >
+| < INC: "++" >
+| < DEC: "--" >
+
+}
+
+
+int one_line() : // punto de entrada del analizador sintactico
+{}
+{
+		Funcion()	{
+		return 1;	}
+ 	|   Sentencia()
+ 	{
+ 		return 2; 	}	
+ 	|		< EOF >
+	{
+  		return -1;
+	}
+}
+
+void Funcion() :
+{
+  Token t;
+  Token t2;
+  Vector v = null;
+  Symbol simbolo;
+}
+{
+	(
+		t="function" t2=<IDENTIFICADOR>  	  	{
+  	  		nombrefuncion=t2.image;
+  	  		simbolo = new Symbol(t2.image,t.beginLine);
+  	  		tablageneral.insertarTS(t2.image,simbolo);
+  	  		//Necesito el nombre para guardarlo en la tabla de simbolos como clave		}
+  	  	"(" ( v=ParameterList() )? ")" CompoundStatement()
+    	{
+	    	if( v == null) {
+	       		v = new Vector();
+        	}
+		}
+  	)
+}
+
+// Returns a Vector of strings, one for each identifier.
+Vector ParameterList() :
+{
+	Token t;
+	Vector v = new Vector();
+}
+{
+  t=<IDENTIFICADOR>
+  	{
+  	    System.out.println("tabla activa");
+    	v.addElement(t.image);
+    }
+  ("," t=<IDENTIFICADOR>{
+                            v.addElement(t.image);
+                        })*
+  						{
+                         	return v;
+                        }
+}
+
+void CompoundStatement() :
+{
+	Token t;
+	JSVarDeclExpression vars;
+	Vector<Token> v;
+}
+{
+  //Con la entrada de un bloque, la operación set crea una nueva subtabla (dentro de la TS) ////////////////////////////////////////////
+  //No hay funciones anidadas
+  t="{"
+	{//
+//Entro en un bloque, luego creo una nueva subtabla como pone en los apuntes//  stmts = new JSCompoundStatement(t);
+		tablaactiva = new TablaSimbolos(tablageneral);
+		tablas.put(nombrefuncion, tablaactiva);//tablas es una lista de hash que guarda los nombres de tablas
+	}
+  	(vars=Sentencia())*
+    {
+  	}
+  	"}"  	{
+  		tablaactiva = tablas.get("general");  	}
+  	/*El nacimiento de una nueva subtabla no implica
+  	obligatoriamente una necesidad suplementaria de espacio en la tabla de símbolos,
+   	pues los atributos de las nuevas variables se almacenan enla subtabla durante la
+   	compilación del bloque y se borran después de que se lee el END delbloque.
+	Esta operación también debe volver a activar la parte de la tabla de símbolos que contiene las variables presentes
+	en elprograma antes de la entrada en el bloque */
+}
+
+JSVarDeclExpression Sentencia() :
+{
+  Token t;
+  JSVarDeclExpression v=null;
+}
+{
+	(
+      t=";"
+   		{
+        }
+    |
+      t="if" Condicion() Sentencia()
+     	{
+        }
+    |
+      t="do" Sentencia() "while" Condicion()
+        {
+        }
+    |
+      v=VariablesOrExpression()
+      	{    	}	
+    |
+      t="return" ( Expresion() )?
+        {
+        }
+    |
+      t="prompt" Prompt()
+        {      	}
+    |		
+      CompoundStatement()
+  )
+  {  		return v;  }  
+}
+
+JSVarDeclExpression VariablesOrExpression() :
+{
+	Token t; //Los tokens que vaya leyendo los almacenaré aqui desde el lexico
+	Vector v = null;   // Aqui me pasan las variables declaradas de la produccion siguiente del arbol
+	JSVarDeclExpression e = null; //
+	Symbol simbolo;
+}
+{
+	(
+      t="var" v=Variables()
+						{
+							int i=0;
+						  	while(v.size() > i)						  	{//Introduce el tipo JSVarDecl
+						  		Token tok= (Token)v.get(i);
+						  			System.out.println("elemento "+tok);
+						  		if (tablaactiva.existeClave(tok.image))						  		{
+						  			System.out.println("elemento "+tok+" ya insertado en tabla ");								  		}
+						  		else						  		{
+						  			simbolo = new Symbol(tok.image, tok.beginLine);						  			tablaactiva.insertarTS(tok.image, simbolo);
+						  		}
+						  		i++;						  	}
+                         	e = new JSVarDeclExpression(t, v);
+                        }
+    |
+    Expresion()
+  )
+  {  		return e;
+  }
+}
+
+Vector<Token > Variables() :
+{
+	Vector v = new Vector<Token>();
+  	Token t;
+}
+{
+  t=Variable()
+  	{
+    	v.addElement(t);
+       	//Inserto en la tabla activa el nombre de la variable que se ha declarado
+        //tablaactiva.insertarTS();
+    }
+  ("," t=Variable()
+  	{
+    	v.addElement(t);
+    }
+  		)*
+  {  	return v;  }
+}
+
+Token Variable() :
+{
+	Token t;
+    //JSExpression e = null;
+}
+{
+  t=<IDENTIFICADOR> ( "=" AssignmentExpression() )?
+ {
+ 	return t;
+ }
+}
+
+JSExpresion Condicion() :
+{
+  JSExpresion op=null;
+}
+{
+  "(" Expresion() ")"
+	{
+			return op;
+ 	}
+}
+
+int Prompt():
+{
+//Declaraciones
+	Token t;		}
+{	"(" < IDENTIFICADOR >")"
+	{
+		System.out.println("LLAMADA PROMPT");
+		return 2;			}
+}		
+JSExpresion Expresion() :
+{
+	Token t;
+	JSExpresion expr=null;
+	AsignInstruccion asig1;
+}
+{
+  asig1=AssignmentExpression()
+  (t="," AssignmentExpression())*
+  {  		return expr;
+  }
+}
+
+AsignInstruccion AssignmentExpression() :
+{
+	Token t=null;
+	InterrogInstruccion op=null;
+	JSRelacional rel=null;
+	AsignInstruccion res=null;
+	JSExpresion id=null;
+	JSExpresion aux= null;
+}
+{
+  	id=PrimaryExpression()
+  	( LOOKAHEAD(2) "=" rel=AndExpression())*  	{
+  			aux = rel.reducir();
+  			res=new AsignInstruccion(id, aux);  	}
+ 	|
+ 	op=ConditionalExpression()		
+  	( LOOKAHEAD(2) t="=" ConditionalExpression())*
+  	{  			return res;
+  	}
+}
+
+InterrogInstruccion ConditionalExpression():
+{
+	Token t;
+	JSRelacional and;
+	InterrogInstruccion op=null;
+	AsignInstruccion asign1=null;
+	AsignInstruccion asign2=null;
+}
+{//En lugar de AndExpression deberia de ser una condicion no?
+//Falta hacer el resultado de AssignmentExpression()
+  and= AndExpression()(t="?" asign1=AssignmentExpression() ":" asign2=AssignmentExpression())?
+  {
+  		op=new InterrogInstruccion(and,asign1,asign2);
+  		return op;
+  }
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+//Precedence is achieved using the cascading style,										  //
+//where each production calls the higher-precedent production immediately following it.   //
+//////////////////////////////////////////////////////////////////////////////////////////// 
+JSRelacional AndExpression() :
+{
+	Token t=null;
+	JSRelacional op=null;
+	JSOperacion op1=null;
+	JSOperacion op2=null;
+}
+{
+  op1=RelationalExpression()
+     (t="&&" op2=RelationalExpression())*
+  {
+  		op= new JSRelacional(t, op1, op2);  		return op;
+  }
+}
+
+JSRelacional RelationalExpression() :
+{
+	Token t=null;
+	JSRelacional op=null;
+	JSAritmetica arit=null;
+	JSExpresion expr1=null;
+	JSExpresion expr2=null;
+}
+{
+  arit=AdditiveExpression()
+  (
+  	( t="<" ) expr2=AdditiveExpression()
+  	{
+  		op=new JSRelacional(t, expr1, expr2); 
+  	})*
+  	{
+  		op=new JSRelacional(t);//Modificar		return op;
+  	}
+}
+
+JSAritmetica AdditiveExpression() :
+{
+	Token t;
+	JSAritmetica op=null;
+	JSExpresion expr1=null;
+	JSExpresion expr2=null;
+}
+{
+	expr1=PrimaryExpression()
+  	(
+  		( t="+" ) expr2=PrimaryExpression()  		{
+	  		op=new JSAritmetica(t, expr1, expr2); 	  	})*
+	  	{
+	  		op=new JSAritmetica(expr1);
+  			return op;  		}
+}
+
+JSExpresion PrimaryExpression() :
+{
+	JSExpresion cons =null;
+  	Token t = null;
+  	boolean islit = true;
+}
+{
+  (
+    "(" Expresion() ")"
+    							{
+                                	islit = false;
+                                }
+  |
+    t=<IDENTIFICADOR>
+    							{
+                                	cons = new JSIdentificador(t, "ID", 4);
+                                }
+  |
+    t=<INTEGER_LITERAL>
+    							{
+    								System.out.println("he leido un entero");
+                                	cons = new JSNumero(t);
+                                }
+  |
+    t=<STRING_LITERAL>
+    							{
+    								System.out.println("he leido un cadena");
+                               		cons = new JSCadena(t);
+								}
+  )
+{	return cons;
+}
+}
