@@ -1,1 +1,1 @@
-prompt(a)
+promp
