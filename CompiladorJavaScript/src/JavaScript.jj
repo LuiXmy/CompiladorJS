@@ -431,11 +431,11 @@ AsignInstruccion AssignmentExpression() :
 	InterrogInstruccion op=null;
 	JSRelacional rel=null;
 	AsignInstruccion res=null;
-	JSExpresion id=null;
+	JSIdentificador id=null;
 	JSExpresion aux= null;
 }
 {
-  	id=PrimaryExpression()
+  	id=(JSIdentificador)PrimaryExpression()
   	( LOOKAHEAD(2) "=" rel=AndExpression())*  	{
   			aux = rel.reducir();
   			res=new AsignInstruccion(id, aux);  	}
@@ -497,7 +497,8 @@ JSRelacional RelationalExpression() :
   		op=new JSRelacional(t, expr1, expr2); 
   	})*
   	{
-  		op=new JSRelacional(t);//Modificar		return op;
+  		Token aux = arit._t;
+  		op=new JSRelacional(aux);//Modificar		return op;
   	}
 }
 

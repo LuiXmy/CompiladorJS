@@ -1,1 +1,2 @@
-promp
+var a;
+"hola"

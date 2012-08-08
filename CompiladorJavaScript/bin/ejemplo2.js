@@ -1,1 +1,2 @@
-prompt(a)
+var a;
+"hola"

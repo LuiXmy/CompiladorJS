@@ -411,7 +411,7 @@ public class eg1 implements eg1Constants {
         InterrogInstruccion op=null;
         JSRelacional rel=null;
         AsignInstruccion res=null;
-        JSExpresion id=null;
+        JSIdentificador id=null;
         JSExpresion aux= null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IDENTIFICADOR:
@@ -527,7 +527,8 @@ public class eg1 implements eg1Constants {
       expr2 = AdditiveExpression();
                 op=new JSRelacional(t, expr1, expr2);
     }
-                op=new JSRelacional(t);//Modificar
+                Token aux = arit._t;
+                op=new JSRelacional(aux);//Modificar
                 {if (true) return op;}
     throw new Error("Missing return statement in function");
   }
@@ -641,14 +642,14 @@ public class eg1 implements eg1Constants {
     return false;
   }
 
-  static private boolean jj_3_2() {
-    if (jj_scan_token(ASIGNACION)) return true;
-    if (jj_3R_11()) return true;
+  static private boolean jj_3R_13() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
-  static private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
+  static private boolean jj_3_2() {
+    if (jj_scan_token(ASIGNACION)) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
