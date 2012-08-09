@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 import java.util.HashMap;
 /**
  * @author Luis Miguel
@@ -20,31 +16,27 @@ class Symbol {//Esto se guardará en el campo Value de la tabla de momento tira c
     public String tipo;
     public static int desplazamiento=0;//direccion relativa del identificador
     
-    public Symbol(String key, int numero) {
+    public Symbol(String key, int linea) {
     	super();
 		this.key = key;
-		this.numerolinea = numero;
+		this.numerolinea = linea;
     }
     
-    public Symbol(String key, int numero, String tipo) {
+    public Symbol(String key, int linea, String tipo) {
     	super();
     	this.key = key;
-    	this.numerolinea = numero;
+    	this.numerolinea = linea;
     	this.tipo = tipo;
     }
     
-    public Symbol(String key, int numero, String tipo, int tamano) {
+    public Symbol(String key, int linea, String tipo, int tamano) {
     	super();
     	this.key = key;
-    	this.numerolinea = numero;
+    	this.numerolinea = linea;
     	this.tipo = tipo;
     	Symbol.desplazamiento+= tamano;
     }
     
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "Symbol [key=" + key + ", linea=" + numerolinea + "]";
@@ -58,29 +50,33 @@ public class TablaSimbolos {
 	TablaSimbolos padre;
 		
 	public TablaSimbolos() {
-		//tabla = new HashMap<String, Integer>();	EMPIEZO A METER SYMBOL EN EL CAMPO VALOR DE LA LISTA
 		tabla=new HashMap<String, Symbol>();
 		padre = null;
 	}
 	
 	public TablaSimbolos(TablaSimbolos padre) {
-//		tabla = new HashMap<String, Integer>();     EMPIEZO A METER SYMBOL EN EL CAMPO VALOR DE LA LISTA
 		tabla = new HashMap<String, Symbol>();
 		this.padre = padre;
 	}
-
-//	void insertarTS(String nombre, int simbolo){
-//		tabla.put(nombre, simbolo);
-//	}
 	
 	void insertarTS(String nombre, Symbol simbolo){
 		tabla.put(nombre, simbolo);
 	}
-	int buscar(String clave){
+	boolean buscar(String clave){
 		if (tabla.containsKey(clave))
-			return 1;	
+			return true;	
 		else
-			return 0;
+			return false;
+	}
+	
+	String tipo(String clave){
+		Symbol res;
+		if (tabla.containsKey(clave)){
+			res=tabla.get(clave);
+			return res.tipo;
+		}else{
+			return "ERROR";
+		}
 	}
 	
 	boolean existeClave(String nombre){

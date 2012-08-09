@@ -8,12 +8,13 @@ public class JSAritmetica extends JSOperacion {
 	JSExpresion _expr1=null;
 	JSExpresion _expr2=null;
 	
-	public JSAritmetica(Token t, JSExpresion expr1, JSExpresion expr2){
+	public JSAritmetica(Token t, JSExpresion expr1, JSExpresion expr2,TablaSimbolos activa){
 		super(t, "ENTERO");
 		if(expr1._tipo=="ENTERO" && expr2._tipo=="ENTERO"){
 			_expr1=expr1;
 			_expr2=expr2;
-		}else{
+		}else if(expr1._tipo=="ID"&& activa.existeClave(expr1._operacion.image)&&
+				expr2._tipo=="ENTERO"){
 			error("\nERROR DE TIPOS");
 		}
 	}

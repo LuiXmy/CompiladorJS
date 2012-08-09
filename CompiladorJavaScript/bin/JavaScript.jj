@@ -349,7 +349,6 @@ JSVarDeclExpression VariablesOrExpression() :
 							int i=0;
 						  	while(v.size() > i)						  	{//Introduce el tipo JSVarDecl
 						  		Token tok= (Token)v.get(i);
-						  			System.out.println("elemento "+tok);
 						  		if (tablaactiva.existeClave(tok.image))						  		{
 						  			System.out.println("La variable "+tok+" ya ha sido declarada");								  		}
 						  		else						  		{
@@ -407,14 +406,16 @@ JSExpresion Condicion() :
  	}
 }
 
-int Prompt():
+JSPrompt Prompt():
 {
 //Declaraciones
-	Token t;		}
+	Token t;
+	JSPrompt promp=null;		}
 {	"(" < IDENTIFICADOR >")"
 	{
+		promp = new JSPrompt();
 		System.out.println("LLAMADA PROMPT");
-		return 2;			}
+		return promp;			}
 }		
 JSExpresion Expresion() :
 {
@@ -515,13 +516,13 @@ JSAritmetica AdditiveExpression() :
 	expr1=PrimaryExpression()
   	(
   		( t="+" ) expr2=PrimaryExpression()  		{  				
-	  		op=new JSAritmetica(t, expr1, expr2);
+	  		op=new JSAritmetica(t, expr1, expr2, tablaactiva);
 	  		op.reducir();
 	  		return op;	  	})*
-	  	{
-	  		op2=new JSAritmetica(t,op,expr1);
-	  		op2.reducir();
-  			return op2;  		}
+	{
+		op2=new JSAritmetica(t,op,expr1);
+		op2.reducir();
+  		return op2;  	}
 }
 
 JSExpresion PrimaryExpression() :

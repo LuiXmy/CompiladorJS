@@ -285,7 +285,6 @@ public class eg1 implements eg1Constants {
                                                         while(v.size() > i)
                                                         {//Introduce el tipo JSVarDecl
                                                                 Token tok= (Token)v.get(i);
-                                                                        System.out.println("elemento "+tok);
                                                                 if (tablaactiva.existeClave(tok.image))
                                                                 {
                                                                         System.out.println("La variable "+tok+" ya ha sido declarada");
@@ -353,14 +352,16 @@ public class eg1 implements eg1Constants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public int Prompt() throws ParseException {
+  static final public JSPrompt Prompt() throws ParseException {
 //Declaraciones
         Token t;
+        JSPrompt promp=null;
     jj_consume_token(PARENDRCHA);
     jj_consume_token(IDENTIFICADOR);
     jj_consume_token(PARENIZQ);
+                promp = new JSPrompt();
                 System.out.println("LLAMADA PROMPT");
-                {if (true) return 2;}
+                {if (true) return promp;}
     throw new Error("Missing return statement in function");
   }
 
@@ -508,13 +509,13 @@ public class eg1 implements eg1Constants {
       }
       t = jj_consume_token(MAS);
       expr2 = PrimaryExpression();
-                        op=new JSAritmetica(t, expr1, expr2);
+                        op=new JSAritmetica(t, expr1, expr2, tablaactiva);
                         op.reducir();
                         {if (true) return op;}
     }
-                        op2=new JSAritmetica(t,op,expr1);
-                        op2.reducir();
-                        {if (true) return op2;}
+                op2=new JSAritmetica(t,op,expr1);
+                op2.reducir();
+                {if (true) return op2;}
     throw new Error("Missing return statement in function");
   }
 
