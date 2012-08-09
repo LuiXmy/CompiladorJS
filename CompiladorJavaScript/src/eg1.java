@@ -222,7 +222,15 @@ public class eg1 implements eg1Constants {
   static final public JSVarDeclExpression Sentencia() throws ParseException {
   Token t;
   JSVarDeclExpression v=null;
+  AsignInstruccion i=null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IDENTIFICADOR:
+    case INTEGER_LITERAL:
+    case STRING_LITERAL:
+    case PARENDRCHA:
+      i = AssignmentExpression();
+
+      break;
     case PUNTOYCOMA:
       t = jj_consume_token(PUNTOYCOMA);
 
@@ -241,10 +249,6 @@ public class eg1 implements eg1Constants {
 
       break;
     case VAR:
-    case IDENTIFICADOR:
-    case INTEGER_LITERAL:
-    case STRING_LITERAL:
-    case PARENDRCHA:
       v = VariablesOrExpression();
 
       break;
@@ -409,47 +413,25 @@ public class eg1 implements eg1Constants {
   static final public AsignInstruccion AssignmentExpression() throws ParseException {
         Token t=null;
         InterrogInstruccion op=null;
-        JSRelacional rel=null;
+        JSAritmetica rel=null;
         AsignInstruccion res=null;
-        JSIdentificador id=null;
+        JSExpresion id=null;
         JSExpresion aux= null;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case IDENTIFICADOR:
-    case INTEGER_LITERAL:
-    case STRING_LITERAL:
-    case PARENDRCHA:
-      id = PrimaryExpression();
-      label_5:
-      while (true) {
-        if (jj_2_1(2)) {
-          ;
-        } else {
-          break label_5;
-        }
-        jj_consume_token(ASIGNACION);
-        rel = AndExpression();
+    id = PrimaryExpression();
+    label_5:
+    while (true) {
+      if (jj_2_1(2)) {
+        ;
+      } else {
+        break label_5;
       }
+      jj_consume_token(ASIGNACION);
+      rel = AdditiveExpression();
+    }
+                        System.out.println("algo es algo");
                         aux = rel.reducir();
                         res=new AsignInstruccion(id, aux);
-      break;
-      op = ConditionalExpression();
-      label_6:
-      while (true) {
-        if (jj_2_2(2)) {
-          ;
-        } else {
-          break label_6;
-        }
-        t = jj_consume_token(ASIGNACION);
-        ConditionalExpression();
-      }
                         {if (true) return res;}
-      break;
-    default:
-      jj_la1[10] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
     throw new Error("Missing return statement in function");
   }
 
@@ -470,7 +452,7 @@ public class eg1 implements eg1Constants {
       asign2 = AssignmentExpression();
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[10] = jj_gen;
       ;
     }
                 op=new InterrogInstruccion(and,asign1,asign2);
@@ -488,15 +470,15 @@ public class eg1 implements eg1Constants {
         JSOperacion op1=null;
         JSOperacion op2=null;
     op1 = RelationalExpression();
-    label_7:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
         ;
         break;
       default:
-        jj_la1[12] = jj_gen;
-        break label_7;
+        jj_la1[11] = jj_gen;
+        break label_6;
       }
       t = jj_consume_token(AND);
       op2 = RelationalExpression();
@@ -513,15 +495,15 @@ public class eg1 implements eg1Constants {
         JSExpresion expr1=null;
         JSExpresion expr2=null;
     arit = AdditiveExpression();
-    label_8:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MENOR:
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
-        break label_8;
+        jj_la1[12] = jj_gen;
+        break label_7;
       }
       t = jj_consume_token(MENOR);
       expr2 = AdditiveExpression();
@@ -539,19 +521,20 @@ public class eg1 implements eg1Constants {
         JSExpresion expr1=null;
         JSExpresion expr2=null;
     expr1 = PrimaryExpression();
-    label_9:
+    label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAS:
         ;
         break;
       default:
-        jj_la1[14] = jj_gen;
-        break label_9;
+        jj_la1[13] = jj_gen;
+        break label_8;
       }
       t = jj_consume_token(MAS);
       expr2 = PrimaryExpression();
                         op=new JSAritmetica(t, expr1, expr2);
+                        {if (true) return op;}
     }
                         op=new JSAritmetica(expr1);
                         {if (true) return op;}
@@ -584,7 +567,7 @@ public class eg1 implements eg1Constants {
                                         cons = new JSCadena(t);
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[14] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -599,78 +582,50 @@ public class eg1 implements eg1Constants {
     finally { jj_save(0, xla); }
   }
 
-  static private boolean jj_2_2(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_2(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(1, xla); }
-  }
-
-  static private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_15()) {
-    jj_scanpos = xsp;
-    if (jj_3R_16()) {
-    jj_scanpos = xsp;
-    if (jj_3R_17()) {
-    jj_scanpos = xsp;
-    if (jj_3R_18()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_18() {
-    if (jj_scan_token(STRING_LITERAL)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_11() {
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_17() {
+  static private boolean jj_3R_13() {
     if (jj_scan_token(INTEGER_LITERAL)) return true;
     return false;
   }
 
   static private boolean jj_3R_10() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_13() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_11()) {
+    jj_scanpos = xsp;
+    if (jj_3R_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_13()) {
+    jj_scanpos = xsp;
     if (jj_3R_14()) return true;
+    }
+    }
+    }
     return false;
   }
 
-  static private boolean jj_3_2() {
-    if (jj_scan_token(ASIGNACION)) return true;
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_16() {
-    if (jj_scan_token(IDENTIFICADOR)) return true;
+  static private boolean jj_3R_14() {
+    if (jj_scan_token(STRING_LITERAL)) return true;
     return false;
   }
 
   static private boolean jj_3R_12() {
-    if (jj_3R_13()) return true;
+    if (jj_scan_token(IDENTIFICADOR)) return true;
     return false;
   }
 
-  static private boolean jj_3R_15() {
-    if (jj_scan_token(PARENDRCHA)) return true;
+  static private boolean jj_3R_9() {
+    if (jj_3R_10()) return true;
     return false;
   }
 
   static private boolean jj_3_1() {
     if (jj_scan_token(ASIGNACION)) return true;
-    if (jj_3R_10()) return true;
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11() {
+    if (jj_scan_token(PARENDRCHA)) return true;
     return false;
   }
 
@@ -686,7 +641,7 @@ public class eg1 implements eg1Constants {
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[16];
+  static final private int[] jj_la1 = new int[15];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -694,12 +649,12 @@ public class eg1 implements eg1Constants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xb9938801,0x1000000,0x0,0xb9138800,0x39000000,0xb9138800,0x39010000,0x0,0x0,0x0,0x39000000,0x0,0x0,0x0,0x0,0x39000000,};
+      jj_la1_0 = new int[] {0xb9938801,0x1000000,0x0,0xb9138800,0x39000000,0xb9138800,0x39010000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x39000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x8,0x0,0x10,0x8,0x0,0x8,0x0,0x10,0x40,0x10,0x0,0x4000,0x200000,0x100,0x200,0x0,};
+      jj_la1_1 = new int[] {0x8,0x0,0x10,0x8,0x0,0x8,0x0,0x10,0x40,0x10,0x4000,0x200000,0x100,0x200,0x0,};
    }
-  static final private JJCalls[] jj_2_rtns = new JJCalls[2];
+  static final private JJCalls[] jj_2_rtns = new JJCalls[1];
   static private boolean jj_rescan = false;
   static private int jj_gc = 0;
 
@@ -721,7 +676,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -736,7 +691,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -754,7 +709,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -765,7 +720,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -782,7 +737,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -792,7 +747,7 @@ public class eg1 implements eg1Constants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -909,7 +864,7 @@ public class eg1 implements eg1Constants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 15; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -948,7 +903,7 @@ public class eg1 implements eg1Constants {
 
   static private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -956,7 +911,6 @@ public class eg1 implements eg1Constants {
           jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
           switch (i) {
             case 0: jj_3_1(); break;
-            case 1: jj_3_2(); break;
           }
         }
         p = p.next;

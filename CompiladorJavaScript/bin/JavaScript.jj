@@ -300,9 +300,14 @@ JSVarDeclExpression Sentencia() :
 {
   Token t;
   JSVarDeclExpression v=null;
+  AsignInstruccion i=null;
 }
 {
 	(
+      i=AssignmentExpression()
+    	{
+    	}
+    |		
       t=";"
    		{
         }
@@ -324,7 +329,7 @@ JSVarDeclExpression Sentencia() :
     |
       t="prompt" Prompt()
         {      	}
-    |		
+    |
       CompoundStatement()
   )
   {  		return v;  }  
@@ -429,21 +434,19 @@ AsignInstruccion AssignmentExpression() :
 {
 	Token t=null;
 	InterrogInstruccion op=null;
-	JSRelacional rel=null;
+	JSAritmetica rel=null;
 	AsignInstruccion res=null;
-	JSIdentificador id=null;
+	JSExpresion id=null;
 	JSExpresion aux= null;
 }
 {
-  	id=(JSIdentificador)PrimaryExpression()
-  	( LOOKAHEAD(2) "=" rel=AndExpression())*  	{
+  	id = PrimaryExpression()
+  	(LOOKAHEAD(2) < ASIGNACION > rel=AdditiveExpression())*  	{
+  			System.out.println("algo es algo");
   			aux = rel.reducir();
-  			res=new AsignInstruccion(id, aux);  	}
- 	|
- 	op=ConditionalExpression()		
-  	( LOOKAHEAD(2) t="=" ConditionalExpression())*
-  	{  			return res;
-  	}
+  			res=new AsignInstruccion(id, aux);
+  			return res;  	}
+// 	|// 	op=ConditionalExpression()		//  	( LOOKAHEAD(2) t="=" ConditionalExpression())*//  	{//  	}
 }
 
 InterrogInstruccion ConditionalExpression():
@@ -498,7 +501,8 @@ JSRelacional RelationalExpression() :
   	})*
   	{
   		Token aux = arit._t;
-  		op=new JSRelacional(aux);//Modificar		return op;
+  		op=new JSRelacional(aux);//Modificar
+		return op;
   	}
 }
 
@@ -512,8 +516,9 @@ JSAritmetica AdditiveExpression() :
 {
 	expr1=PrimaryExpression()
   	(
-  		( t="+" ) expr2=PrimaryExpression()  		{
-	  		op=new JSAritmetica(t, expr1, expr2); 	  	})*
+  		( t="+" ) expr2=PrimaryExpression()  		{  				
+	  		op=new JSAritmetica(t, expr1, expr2);
+	  		return op;	  	})*
 	  	{
 	  		op=new JSAritmetica(expr1);
   			return op;  		}

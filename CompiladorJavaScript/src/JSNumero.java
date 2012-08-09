@@ -15,7 +15,7 @@ public class JSNumero extends JSExpresion{
 	//int DIGITO = 26;
 	//sacado de eg1Constants.java
 	public JSNumero(Token valor){
-		super(valor,"DIGITO");
+		super(valor,"ENTERO");
 		_valor=Integer.parseInt(valor.image);		
 	}
 }
