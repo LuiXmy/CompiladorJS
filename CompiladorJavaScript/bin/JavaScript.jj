@@ -284,7 +284,7 @@ void CompoundStatement() :
 		tablaactiva = new TablaSimbolos(tablageneral);
 		tablas.put(nombrefuncion, tablaactiva);//tablas es una lista de hash que guarda los nombres de tablas
 	}
-  	(vars=Sentencia())*
+  	vars=Sentencia()
     {
   	}
   	"}"  	{
@@ -305,12 +305,13 @@ JSVarDeclExpression Sentencia() :
 }
 {
 	(
-      i=AssignmentExpression()
+      LOOKAHEAD(2) < IDENTIFICADOR > "("  LlamadaFun() //Llamada a funcion
+		{		}
+	|
+      LOOKAHEAD(2) PrimaryExpression() i=AssignmentExpression()
     	{
     	}
     |
-    (LOOKAHEAD(2) < IDENTIFICADOR > "(") LlamadaFun() //Llamada a funcion
-    |				
       t=";"
    		{
         }
@@ -334,9 +335,7 @@ JSVarDeclExpression Sentencia() :
         {      	}
     |
       < DOCUMENT > < PUNTO >< WRITE > "(" DocumentWrite()
-    |		
-      CompoundStatement()
-  )
+  	)
   {  		return v;  }  
 }
 
@@ -346,43 +345,38 @@ JSVarDeclExpression VariablesOrExpression() :
 	Vector v = null;   // Aqui me pasan las variables declaradas de la produccion siguiente del arbol
 	JSVarDeclExpression e = null; //
 	Symbol simbolo;
+	JSExpresion expr=null;
+	JSExpresion expr2=null;
 }
 {
-	(
-      v=Variables()
-						{
-							int i=0;
-						  	while(v.size() > i)						  	{//Introduce el tipo JSVarDecl
-						  		Token tok= (Token)v.get(i);
-						  		if (tablaactiva.existeClave(tok.image))						  		{
-						  			System.out.println("La variable "+tok+" ya ha sido declarada");								  		}
-						  		else						  		{
-						  			simbolo = new Symbol(tok.image, tok.beginLine);						  			tablaactiva.insertarTS(tok.image, simbolo);
-						  		}
-						  		i++;						  	}
-                         	e = new JSVarDeclExpression(t, v);
-                        }
-//    |//    Expresion()
-  )
-  {  		return e;
-  }
-}
-
-JSDocumenWInstr DocumentWrite():
-{	//Declaraciones
-	JSDocumenWInstr doc=null;
-	JSExpresion expr=null;
-}{	expr=PrimaryExpression() ")" //Solo variable de tipo cadena
-	{
-			//Evalua la expresion y la muestra por pantalla
-			doc=new JSDocumenWInstr(expr);
-			return doc;				}
+	  LOOKAHEAD(3)expr=PrimaryExpression() < ASIGNACION > < NEW > < ARRAY > "(" expr2=PrimaryExpression() ")" //Expr2 tiene que ser constante numerica
+      {
+      		if(expr2._tipo!="ENTERO")      		{
+      			System.out.println("Error");      		}
+      		e=null;
+      		System.out.println("Declaracion de array");
+      }
+      |		
+      LOOKAHEAD(3)v=Variables()
+	  {			int i=0;
+			while(v.size() > i)			{//Introduce el tipo JSVarDecl
+				Token tok= (Token)v.get(i);
+				if (tablaactiva.existeClave(tok.image))				{
+					System.out.println("La variable "+tok+" ya ha sido declarada");						}
+				else				{
+					simbolo = new Symbol(tok.image, tok.beginLine);					tablaactiva.insertarTS(tok.image, simbolo);
+				}
+				i++;				}
+           	e = new JSVarDeclExpression(t, v);
+       }
+       {
+       		return e;       }//    Expresion()
 }
 
 Vector<Token > Variables() :
 {
 	Vector v = new Vector<Token>();
-  	Token t;
+  	Token t=null;
 }
 {
   t=Variable()
@@ -396,19 +390,32 @@ Vector<Token > Variables() :
     	v.addElement(t);
     }
   		)*
-  {  	return v;  }
+  {
+  	return v;
+  }
 }
 
 Token Variable() :
 {
-	Token t;
+	Token t=null;
     //JSExpression e = null;
 }
 {
-  t=<IDENTIFICADOR> ( "=" AssignmentExpression() )?
+  (AssignmentExpression())?
  {
  	return t;
  }
+}
+
+JSDocumenWInstr DocumentWrite():
+{	//Declaraciones
+	JSDocumenWInstr doc=null;
+	JSExpresion expr=null;
+}{	expr=PrimaryExpression() ")" //Solo variable de tipo cadena
+	{
+			//Evalua la expresion y la muestra por pantalla
+			doc=new JSDocumenWInstr(expr);
+			return doc;				}
 }
 
 JSExpresion Condicion() :
@@ -459,21 +466,22 @@ AsignInstruccion AssignmentExpression() :
 }
 {
   	id = PrimaryExpression()
-  	(LOOKAHEAD(2) < ASIGNACION > rel=AdditiveExpression())*  	{
+  	(LOOKAHEAD(2) < ASIGNACION >  rel=AdditiveExpression())*
+  	//COMPROBAR EN SEMANTICO SI ES FUNCION...OPERACIO...ETC  	{
   			res=new AsignInstruccion(id, aux);
-  			return res;  	}
- 	|
- 	id = PrimaryExpression()
- 	(LOOKAHEAD(2) < ASIGNACION > LlamadaFun())*
- 	{ 	}		
- 	| 	op=ConditionalExpression()		  	(LOOKAHEAD(2) < ASIGNACION > ConditionalExpression())*  	{  	}
+  			  	}
+ 	{
+ 		return res; 	}		
 }
 
 JSFuncion LlamadaFun():
 {
-		//Declaraciones}
+	//Declaraciones
+	JSFuncion fun=null;}
 {
-		}
+	ParameterList()")"	{
+		System.out.println("Llamo a una funcion");
+		return fun;	}		}
 
 InterrogInstruccion ConditionalExpression():
 {
