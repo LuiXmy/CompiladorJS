@@ -320,10 +320,10 @@ JSVarDeclExpression Sentencia() :
         {
         }
     |
-      v=VariablesOrExpression()
+      t="var" v=VariablesOrExpression()
       	{    	}	
     |
-      t="return" ( Expresion() )?
+      t="return" Expresion()
         {
         }
     |
@@ -337,29 +337,28 @@ JSVarDeclExpression Sentencia() :
 
 JSVarDeclExpression VariablesOrExpression() :
 {
-	Token t; //Los tokens que vaya leyendo los almacenaré aqui desde el lexico
+	Token t=null; //Los tokens que vaya leyendo los almacenaré aqui desde el lexico
 	Vector v = null;   // Aqui me pasan las variables declaradas de la produccion siguiente del arbol
 	JSVarDeclExpression e = null; //
 	Symbol simbolo;
 }
 {
 	(
-      t="var" v=Variables()
+      v=Variables()
 						{
 							int i=0;
 						  	while(v.size() > i)						  	{//Introduce el tipo JSVarDecl
 						  		Token tok= (Token)v.get(i);
 						  			System.out.println("elemento "+tok);
 						  		if (tablaactiva.existeClave(tok.image))						  		{
-						  			System.out.println("elemento "+tok+" ya insertado en tabla ");								  		}
+						  			System.out.println("La variable "+tok+" ya ha sido declarada");								  		}
 						  		else						  		{
 						  			simbolo = new Symbol(tok.image, tok.beginLine);						  			tablaactiva.insertarTS(tok.image, simbolo);
 						  		}
 						  		i++;						  	}
                          	e = new JSVarDeclExpression(t, v);
                         }
-    |
-    Expresion()
+//    |//    Expresion()
   )
   {  		return e;
   }
@@ -442,8 +441,6 @@ AsignInstruccion AssignmentExpression() :
 {
   	id = PrimaryExpression()
   	(LOOKAHEAD(2) < ASIGNACION > rel=AdditiveExpression())*  	{
-  			System.out.println("algo es algo");
-  			aux = rel.reducir();
   			res=new AsignInstruccion(id, aux);
   			return res;  	}
 // 	|// 	op=ConditionalExpression()		//  	( LOOKAHEAD(2) t="=" ConditionalExpression())*//  	{//  	}
@@ -508,8 +505,9 @@ JSRelacional RelationalExpression() :
 
 JSAritmetica AdditiveExpression() :
 {
-	Token t;
+	Token t=null;
 	JSAritmetica op=null;
+	JSAritmetica op2=null;
 	JSExpresion expr1=null;
 	JSExpresion expr2=null;
 }
@@ -518,10 +516,12 @@ JSAritmetica AdditiveExpression() :
   	(
   		( t="+" ) expr2=PrimaryExpression()  		{  				
 	  		op=new JSAritmetica(t, expr1, expr2);
+	  		op.reducir();
 	  		return op;	  	})*
 	  	{
-	  		op=new JSAritmetica(expr1);
-  			return op;  		}
+	  		op2=new JSAritmetica(t,op,expr1);
+	  		op2.reducir();
+  			return op2;  		}
 }
 
 JSExpresion PrimaryExpression() :
@@ -544,13 +544,11 @@ JSExpresion PrimaryExpression() :
   |
     t=<INTEGER_LITERAL>
     							{
-    								System.out.println("he leido un entero");
                                 	cons = new JSNumero(t);
                                 }
   |
     t=<STRING_LITERAL>
     							{
-    								System.out.println("he leido un cadena");
                                		cons = new JSCadena(t);
 								}
   )

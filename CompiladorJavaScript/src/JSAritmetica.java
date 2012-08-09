@@ -10,12 +10,11 @@ public class JSAritmetica extends JSOperacion {
 	
 	public JSAritmetica(Token t, JSExpresion expr1, JSExpresion expr2){
 		super(t, "ENTERO");
-		if(expr1._tipo!="ENTERO" && expr1._tipo!="ENTERO"){
-			error("ERROR DE TIPOS");
-		}else
-		{
+		if(expr1._tipo=="ENTERO" && expr2._tipo=="ENTERO"){
 			_expr1=expr1;
 			_expr2=expr2;
+		}else{
+			error("\nERROR DE TIPOS");
 		}
 	}
 	public JSAritmetica(JSExpresion expr1){//He añadido esto porque necesito pasar cadenas o enteros unicamente hacia arriba

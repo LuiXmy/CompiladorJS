@@ -1,2 +1,4 @@
-var a;
-a=2+3+5+6;
+var a,b,c
+a=2+3;
+prompt(a)
+"hola"
