@@ -6,6 +6,7 @@ options
   JDK_VERSION = "1.5";
   static = true;
   CHOICE_AMBIGUITY_CHECK = 4;
+  DEBUG_TOKEN_MANAGER=false;//DEBUGGEAR
 }
 
 PARSER_BEGIN(eg1)
@@ -225,7 +226,7 @@ int one_line() : // punto de entrada del analizador sintactico
 	}
 }
 
-void Funcion() :
+void Funcion() : //Declaracion de funciones
 {
   Token t;
   Token t2;
@@ -237,8 +238,8 @@ void Funcion() :
 		t="function" t2=<IDENTIFICADOR>  	  	{
   	  		nombrefuncion=t2.image;
   	  		simbolo = new Symbol(t2.image,t.beginLine);
-  	  		tablageneral.insertarTS(t2.image,simbolo);
-  	  		//Necesito el nombre para guardarlo en la tabla de simbolos como clave		}
+  	  		tablageneral.insertarTS(t2.image,simbolo);  	  		//Necesito el nombre para guardarlo en la tabla de simbolos como clave
+		}
   	  	"(" ( v=ParameterList() )? ")" CompoundStatement()
     	{
 	    	if( v == null) {
@@ -307,7 +308,9 @@ JSVarDeclExpression Sentencia() :
       i=AssignmentExpression()
     	{
     	}
-    |		
+    |
+    (LOOKAHEAD(2) < IDENTIFICADOR > "(") LlamadaFun() //Llamada a funcion
+    |				
       t=";"
    		{
         }
@@ -330,6 +333,8 @@ JSVarDeclExpression Sentencia() :
       t="prompt" Prompt()
         {      	}
     |
+      < DOCUMENT > < PUNTO >< WRITE > "(" DocumentWrite()
+    |		
       CompoundStatement()
   )
   {  		return v;  }  
@@ -361,6 +366,17 @@ JSVarDeclExpression VariablesOrExpression() :
   )
   {  		return e;
   }
+}
+
+JSDocumenWInstr DocumentWrite():
+{	//Declaraciones
+	JSDocumenWInstr doc=null;
+	JSExpresion expr=null;
+}{	expr=PrimaryExpression() ")" //Solo variable de tipo cadena
+	{
+			//Evalua la expresion y la muestra por pantalla
+			doc=new JSDocumenWInstr(expr);
+			return doc;				}
 }
 
 Vector<Token > Variables() :
@@ -411,11 +427,13 @@ JSPrompt Prompt():
 //Declaraciones
 	Token t;
 	JSPrompt promp=null;		}
-{	"(" < IDENTIFICADOR >")"
+{	Expresion()")"
 	{
 		promp = new JSPrompt();
-		System.out.println("LLAMADA PROMPT");
-		return promp;			}
+		System.out.println("LLAMADA PROMPT");				}
+	{			
+	return promp;
+}
 }		
 JSExpresion Expresion() :
 {
@@ -444,8 +462,18 @@ AsignInstruccion AssignmentExpression() :
   	(LOOKAHEAD(2) < ASIGNACION > rel=AdditiveExpression())*  	{
   			res=new AsignInstruccion(id, aux);
   			return res;  	}
-// 	|// 	op=ConditionalExpression()		//  	( LOOKAHEAD(2) t="=" ConditionalExpression())*//  	{//  	}
+ 	|
+ 	id = PrimaryExpression()
+ 	(LOOKAHEAD(2) < ASIGNACION > LlamadaFun())*
+ 	{ 	}		
+ 	| 	op=ConditionalExpression()		  	(LOOKAHEAD(2) < ASIGNACION > ConditionalExpression())*  	{  	}
 }
+
+JSFuncion LlamadaFun():
+{
+		//Declaraciones}
+{
+		}
 
 InterrogInstruccion ConditionalExpression():
 {
@@ -520,7 +548,7 @@ JSAritmetica AdditiveExpression() :
 	  		op.reducir();
 	  		return op;	  	})*
 	{
-		op2=new JSAritmetica(t,op,expr1);
+		op2=new JSAritmetica(t,op,expr1,tablaactiva);
 		op2.reducir();
   		return op2;  	}
 }

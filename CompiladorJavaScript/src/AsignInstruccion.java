@@ -17,7 +17,7 @@ public class AsignInstruccion extends Instruccion{
 		if(id._tipo=="INTEGER" && expr._tipo=="INTEGER"){
 			return "INTEGER";
 		}
-		if(id._tipo=="BOOL"    && expr._tipo=="BOOL"){
+		if(id._tipo=="BOOL" && expr._tipo=="BOOL"){
 			return "BOOL";			
 		}
 		return null;

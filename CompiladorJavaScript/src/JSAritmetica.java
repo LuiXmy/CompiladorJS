@@ -24,7 +24,7 @@ public class JSAritmetica extends JSOperacion {
 	}
 	
 	public JSAritmetica generar(){
-		return new JSAritmetica(_operacion, _expr1.reducir(), _expr2.reducir());
+		return new JSAritmetica(_operacion, _expr1.reducir(), _expr2.reducir(),null);
 	}
 	
 	public String toString(){
